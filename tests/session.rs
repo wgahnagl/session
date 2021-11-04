@@ -1,4 +1,4 @@
-use metaverse_login::login::login_with_defaults;
+use metaverse_login::login::{build_struct_with_defaults, login_with_defaults};
 use std::collections::HashMap;
 use std::net::TcpStream;
 use std::process::{Child, Command};
@@ -49,7 +49,7 @@ fn test_mock_session() {
 }
 
 #[test]
-fn test_osgrid_session() {
+fn test_lib_channel() {
     let creds = match read_creds() {
         Some(x) => x,
         None => {
@@ -58,15 +58,18 @@ fn test_osgrid_session() {
         }
     };
 
-    let prod_server_url = build_test_url(OSGRID_URL, OSGRID_PORT);
-    let _login_response = login_with_defaults(
+    let login_response = build_struct_with_defaults(
         creds.get("first").unwrap().to_string(),
         creds.get("last").unwrap().to_string(),
         creds.get("passwd").unwrap().to_string(),
         creds.get("start").unwrap().to_string(),
         true,
         true,
-        prod_server_url,
+    );
+
+    assert_eq!(
+        login_response.channel.unwrap(),
+        env!("CARGO_PKG_NAME").to_string()
     );
 }
 
