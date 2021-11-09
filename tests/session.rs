@@ -69,7 +69,7 @@ fn test_lib_channel() {
 
     assert_eq!(
         login_response.channel.unwrap(),
-        env!("CARGO_PKG_NAME").to_string()
+        env!("CARGO_CRATE_NAME").to_string()
     );
 }
 

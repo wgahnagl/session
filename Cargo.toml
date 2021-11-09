@@ -10,4 +10,5 @@ config = "0.11"
 metaverse_login = "0.0.0"
 
 [patch.crates-io]
+metaverse_login = {git = "https://github.com/unnamed-mmo/login"}
 xmlrpc = {git = "https://github.com/unnamed-mmo/xml-rpc-rs"}
