@@ -1,7 +1,8 @@
-pub fn new_session(login_response: xmlrpc::Value) {
-    if login_response.get("reason") != None {
-        return; //create an error type. failed to create a session
-    }
+use crate::models::session_data::Session;
 
-    login_response.get()
+pub fn new_session(login_response: xmlrpc::Value) -> Option<Session> {
+    if login_response.get("reason") != None {
+        return None; //create an error type. failed to create a session
+    }
+    Some(login_response.into())
 }

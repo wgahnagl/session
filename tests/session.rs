@@ -3,6 +3,7 @@ use metaverse_session::session::new_session;
 
 use std::collections::HashMap;
 use std::net::TcpStream;
+use std::panic;
 use std::process::{Child, Command};
 use std::thread::sleep;
 use std::time::{Duration, Instant};
@@ -89,7 +90,21 @@ fn test_lib_auth() {
         true,
         build_test_url(OSGRID_URL, OSGRID_PORT),
     );
-    new_session(login_response);
+    let verify = panic::catch_unwind(|| {
+        let session = new_session(login_response).unwrap();
+        assert_eq!(session.sim_ip, Some("".to_string()));
+        assert_eq!(
+            session.first_name,
+            Some(creds.get("first").unwrap().to_string())
+        );
+    });
+    if verify.is_err() {
+        assert_eq!(
+            "login likely failed due to being already logged in. Wait a bit",
+            ""
+        );
+        // TODO:verify custom error is thrown
+    }
 }
 
 fn read_creds() -> Option<HashMap<String, String>> {
