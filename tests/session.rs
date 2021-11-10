@@ -1,4 +1,6 @@
 use metaverse_login::login::{build_struct_with_defaults, login_with_defaults};
+use metaverse_session::session::new_session;
+
 use std::collections::HashMap;
 use std::net::TcpStream;
 use std::process::{Child, Command};
@@ -31,6 +33,7 @@ fn test_mock_session() {
     }
 
     let _login_response = login_with_defaults(
+        env!("CARGO_CRATE_NAME").to_string(),
         "first".to_string(),
         "last".to_string(),
         "password".to_string(),
@@ -50,6 +53,24 @@ fn test_mock_session() {
 
 #[test]
 fn test_lib_channel() {
+    let defaults_struct = build_struct_with_defaults(
+        env!("CARGO_CRATE_NAME").to_string(),
+        "first".to_string(),
+        "last".to_string(),
+        "passwd".to_string(),
+        "start".to_string(),
+        true,
+        true,
+    );
+
+    assert_eq!(
+        defaults_struct.channel.unwrap(),
+        env!("CARGO_CRATE_NAME").to_string()
+    );
+}
+
+#[test]
+fn test_lib_auth() {
     let creds = match read_creds() {
         Some(x) => x,
         None => {
@@ -58,19 +79,17 @@ fn test_lib_channel() {
         }
     };
 
-    let login_response = build_struct_with_defaults(
+    let login_response = login_with_defaults(
+        env!("CARGO_CRATE_NAME").to_string(),
         creds.get("first").unwrap().to_string(),
         creds.get("last").unwrap().to_string(),
         creds.get("passwd").unwrap().to_string(),
         creds.get("start").unwrap().to_string(),
         true,
         true,
+        build_test_url(OSGRID_URL, OSGRID_PORT),
     );
-
-    assert_eq!(
-        login_response.channel.unwrap(),
-        env!("CARGO_CRATE_NAME").to_string()
-    );
+    new_session(login_response);
 }
 
 fn read_creds() -> Option<HashMap<String, String>> {
